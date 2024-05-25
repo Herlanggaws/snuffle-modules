@@ -13,7 +13,7 @@ import androidx.compose.material.icons.rounded.RemoveRedEye
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Checkbox
-import androidx.compose.material3.Divider
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
@@ -39,9 +39,9 @@ import com.logixmates.snuffle.auth.presentation.login.states.LoginUiEvent
 import com.logixmates.snuffle.auth.presentation.login.states.LoginUiEvent.Domain
 import com.logixmates.snuffle.auth.presentation.login.states.LoginUiEvent.Presentation
 import com.logixmates.snuffle.auth.presentation.login.states.LoginUiState
-import com.logixmates.snuffle.core.presentation.ANNOTATED_CLICKABLE
 import com.logixmates.snuffle.core.presentation.themes.SnuffleColors
-import com.logixmates.snuffle.core.presentation.toAnnotatedClickableText
+import com.logixmates.snuffle.core.presentation.utils.ANNOTATED_CLICKABLE
+import com.logixmates.snuffle.core.presentation.utils.toAnnotatedClickableText
 
 @Composable
 fun LoginScreenInput(
@@ -158,7 +158,7 @@ fun LoginScreenInput(
             text = stringResource(R.string.forgot_password)
         )
 
-        Divider(thickness = 1.dp)
+        HorizontalDivider(thickness = 1.dp)
 
         Text(
             text = stringResource(R.string.login_with),

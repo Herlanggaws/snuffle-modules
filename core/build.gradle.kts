@@ -11,6 +11,7 @@ android {
     defaultConfig {
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         consumerProguardFiles("consumer-rules.pro")
+        buildConfigField("String", "VERSION_NAME", "\"3.1.0\"")
     }
     buildTypes {
         release {
@@ -20,6 +21,9 @@ android {
                 "proguard-rules.pro"
             )
         }
+    }
+    buildFeatures {
+        buildConfig = true
     }
     publishing {
         singleVariant("debug") {
@@ -33,8 +37,8 @@ android {
 
 dependencies {
     implementation(libs.mmkv)
-    api(libs.sealedx.core)
-    ksp(libs.sealedx.processor)
+    implementation(platform(libs.firebase.bom))
+    implementation(libs.bundles.firebase)
 }
 
 publishing {

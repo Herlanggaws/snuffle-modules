@@ -1,4 +1,4 @@
-package com.logixmates.snuffle.core.presentation
+package com.logixmates.snuffle.core.presentation.activities
 
 import android.os.Parcelable
 import cafe.adriel.voyager.core.registry.ScreenProvider

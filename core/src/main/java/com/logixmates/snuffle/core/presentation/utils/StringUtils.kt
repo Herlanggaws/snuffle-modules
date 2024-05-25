@@ -1,11 +1,10 @@
-package com.logixmates.snuffle.core.presentation
+package com.logixmates.snuffle.core.presentation.utils
 
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.webkit.URLUtil
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.style.TextDecoration

@@ -51,6 +51,7 @@ class AndroidComposeConventionPlugin : Plugin<Project> {
         findLibs("compose-lifecycle-viewmodel")?.let { implementationWithLog(it) }
         findLibs("compose-lifecycle-runtime")?.let { implementationWithLog(it) }
         findLibs("compose-foundation")?.let { implementationWithLog(it) }
+        findLibs("compose-lottie")?.let { implementationWithLog(it) }
         findLibs("compose-animation")?.let { implementationWithLog(it) }
         findLibs("compose-paging")?.let { implementationWithLog(it) }
         findLibs("compose-ui-tooling")?.let { debugImplementationWithLog(it) }

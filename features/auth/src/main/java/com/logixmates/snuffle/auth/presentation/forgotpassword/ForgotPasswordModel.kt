@@ -7,7 +7,7 @@ import com.logixmates.snuffle.auth.presentation.forgotpassword.states.ForgotPass
 import com.logixmates.snuffle.auth.presentation.forgotpassword.states.ForgotPasswordUiEvent.Domain
 import com.logixmates.snuffle.auth.presentation.forgotpassword.states.ForgotPasswordUiState
 import com.logixmates.snuffle.core.data.model.Response
-import com.logixmates.snuffle.core.presentation.checkEmail
+import com.logixmates.snuffle.core.presentation.utils.checkEmail
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow

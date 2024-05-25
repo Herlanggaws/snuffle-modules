@@ -13,6 +13,7 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.Divider
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
@@ -35,9 +36,9 @@ import com.logixmates.snuffle.auth.presentation.register.states.RegisterUiEvent
 import com.logixmates.snuffle.auth.presentation.register.states.RegisterUiEvent.Domain
 import com.logixmates.snuffle.auth.presentation.register.states.RegisterUiEvent.Presentation
 import com.logixmates.snuffle.auth.presentation.register.states.RegisterUiState
-import com.logixmates.snuffle.core.presentation.ANNOTATED_CLICKABLE
+import com.logixmates.snuffle.core.presentation.utils.ANNOTATED_CLICKABLE
 import com.logixmates.snuffle.core.presentation.themes.SnuffleColors
-import com.logixmates.snuffle.core.presentation.toAnnotatedClickableText
+import com.logixmates.snuffle.core.presentation.utils.toAnnotatedClickableText
 
 @Composable
 fun RegisterScreenInput(
@@ -172,9 +173,9 @@ fun RegisterScreenInput(
             modifier = Modifier.padding(vertical = 16.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Divider(thickness = 1.dp, modifier = Modifier.weight(1f))
+            HorizontalDivider(thickness = 1.dp, modifier = Modifier.weight(1f))
             Text("Or", modifier = Modifier.padding(horizontal = 16.dp))
-            Divider(thickness = 1.dp, modifier = Modifier.weight(1f))
+            HorizontalDivider(thickness = 1.dp, modifier = Modifier.weight(1f))
         }
 
 

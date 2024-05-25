@@ -10,7 +10,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.Divider
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -44,7 +44,7 @@ import com.logixmates.snuffle.auth.presentation.register.states.RegisterUiEvent
 import com.logixmates.snuffle.auth.presentation.register.states.RegisterUiEvent.Domain
 import com.logixmates.snuffle.auth.presentation.register.states.RegisterUiEvent.Presentation
 import com.logixmates.snuffle.auth.presentation.register.states.RegisterUiState
-import com.logixmates.snuffle.core.presentation.intentToDefaultBrowser
+import com.logixmates.snuffle.core.presentation.utils.intentToDefaultBrowser
 import com.logixmates.snuffle.core.presentation.themes.SnuffleColors
 import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.flow.launchIn
@@ -104,7 +104,7 @@ class RegisterScreen : Screen, KoinComponent {
                 fontWeight = FontWeight.Bold,
                 color = SnuffleColors.RoyalBlue
             )
-            Divider(thickness = 1.dp, modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp))
+            HorizontalDivider(thickness = 1.dp, modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp))
             RegisterScreenInput(state, onEvent = onEvent)
             Text(
                 text = stringResource(R.string.login_disclaimer),

@@ -3,7 +3,7 @@
 
     <application>
         <activity
-            android:name="com.logixmates.snuffle.core.presentation.SnuffleActivity"
+            android:name="com.logixmates.snuffle.core.presentation.activities.SnuffleActivity"
             android:hardwareAccelerated="true" />
     </application>
 </manifest>

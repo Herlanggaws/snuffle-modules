@@ -5,4 +5,5 @@ import androidx.compose.ui.graphics.Color
 object SnuffleColors {
     val RoyalBlue = Color(0xFF363DDB)
     val Transparent = Color(0x00FFFFFF)
+    val Overlay = Color(0x80000000)
 }

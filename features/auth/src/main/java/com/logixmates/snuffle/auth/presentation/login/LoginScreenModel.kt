@@ -1,5 +1,6 @@
 package com.logixmates.snuffle.auth.presentation.login
 
+import android.util.Log
 import cafe.adriel.voyager.core.model.ScreenModel
 import cafe.adriel.voyager.core.model.screenModelScope
 import com.logixmates.snuffle.auth.data.model.LoginRequest
@@ -7,8 +8,8 @@ import com.logixmates.snuffle.auth.domain.usecase.LoginUseCase
 import com.logixmates.snuffle.auth.presentation.login.states.LoginUiEvent
 import com.logixmates.snuffle.auth.presentation.login.states.LoginUiEvent.Domain
 import com.logixmates.snuffle.auth.presentation.login.states.LoginUiState
-import com.logixmates.snuffle.core.presentation.checkEmail
-import com.logixmates.snuffle.core.presentation.checkPassword
+import com.logixmates.snuffle.core.presentation.utils.checkEmail
+import com.logixmates.snuffle.core.presentation.utils.checkPassword
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -74,11 +75,8 @@ class LoginScreenModel(
         loginUseCase.stream(
             StoreReadRequest.fresh(
                 LoginRequest(
-                    "joseph",
-                    "",
-                    "",
-                    "",
-                    ""
+                    userName = _uiState.value.email,
+                    password = _uiState.value.password
                 )
             )
         ).onEach {
@@ -91,12 +89,18 @@ class LoginScreenModel(
                     oldState.copy(isLoading = false)
                 }
 
-                is StoreReadResponse.Error -> _uiState.update { oldState ->
-                    oldState.copy(isLoading = false, loginErrorMessage = it.errorMessageOrNull())
+                is StoreReadResponse.Error -> {
+                    _uiState.update { oldState ->
+                        oldState.copy(isLoading = false)
+                    }
+                    onEvent(LoginUiEvent.Presentation.OnLoginFailed(it.errorMessageOrNull()))
                 }
 
-                is StoreReadResponse.Data -> _uiState.update { oldState ->
-                    oldState.copy(isLoading = false, loginData = it.value)
+                is StoreReadResponse.Data -> {
+                    _uiState.update { oldState ->
+                        oldState.copy(isLoading = false)
+                    }
+                    onEvent(LoginUiEvent.Presentation.OnLoginSuccess(it.value))
                 }
 
                 else -> Unit

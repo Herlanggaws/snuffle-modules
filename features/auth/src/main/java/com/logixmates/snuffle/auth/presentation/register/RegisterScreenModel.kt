@@ -5,8 +5,8 @@ import cafe.adriel.voyager.core.model.screenModelScope
 import com.logixmates.snuffle.auth.presentation.register.states.RegisterUiEvent
 import com.logixmates.snuffle.auth.presentation.register.states.RegisterUiEvent.Domain
 import com.logixmates.snuffle.auth.presentation.register.states.RegisterUiState
-import com.logixmates.snuffle.core.presentation.checkEmail
-import com.logixmates.snuffle.core.presentation.checkPassword
+import com.logixmates.snuffle.core.presentation.utils.checkEmail
+import com.logixmates.snuffle.core.presentation.utils.checkPassword
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow

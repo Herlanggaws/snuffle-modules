@@ -2,8 +2,12 @@ package com.logixmates.snuffle.auth.presentation.login
 
 import android.app.Activity
 import android.content.Context
+import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -19,6 +23,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLifecycleOwner
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -42,7 +47,8 @@ import com.logixmates.snuffle.auth.presentation.login.states.LoginUiEvent
 import com.logixmates.snuffle.auth.presentation.login.states.LoginUiEvent.Presentation
 import com.logixmates.snuffle.auth.presentation.login.states.LoginUiState
 import com.logixmates.snuffle.auth.presentation.register.RegisterScreen
-import com.logixmates.snuffle.core.presentation.intentToDefaultBrowser
+import com.logixmates.snuffle.core.presentation.components.Loader
+import com.logixmates.snuffle.core.presentation.utils.intentToDefaultBrowser
 import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
@@ -59,6 +65,7 @@ class LoginScreen : Screen, KoinComponent {
         val lifecycleOwner = LocalLifecycleOwner.current
         val navigator = LocalNavigator.currentOrThrow
         val context = LocalContext.current
+        val keyboardController = LocalSoftwareKeyboardController.current
         val googleSignInClient by inject<GoogleSignInClient> { parametersOf(context as Activity) }
         val googleSignInResult = rememberLauncherForActivityResult(
             ActivityResultContracts.StartActivityForResult()
@@ -81,8 +88,13 @@ class LoginScreen : Screen, KoinComponent {
             screenModel.uiEvent.flowWithLifecycle(lifecycleOwner.lifecycle)
                 .filterIsInstance<Presentation>()
                 .onEach { navigator.onEvent(context, it) }
+                .filterIsInstance<LoginUiEvent.Domain.DoLogin>()
+                .onEach { keyboardController?.hide() }
                 .filterIsInstance<Presentation.DoGoogleLogin>()
-                .onEach { googleSignInResult.launch(googleSignInClient.signInIntent) }
+                .onEach {
+                    googleSignInResult.launch(googleSignInClient.signInIntent)
+                    keyboardController?.hide()
+                }
                 .launchIn(this)
         }
         LoginScreenContent(uiState, onEvent = screenModel::onEvent)
@@ -107,9 +119,14 @@ class LoginScreen : Screen, KoinComponent {
             )
             Text(
                 text = stringResource(R.string.login_disclaimer),
-                modifier = Modifier.fillMaxWidth().padding(vertical = 16.dp),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = 16.dp),
                 textAlign = TextAlign.Center
             )
+        }
+        AnimatedVisibility(state.value.isLoading, enter = fadeIn(), exit = fadeOut()) {
+            Loader()
         }
     }
 
@@ -129,6 +146,12 @@ class LoginScreen : Screen, KoinComponent {
             Presentation.OnSnufflePrivacyClick -> PRIVACY_POLICY_URL.intentToDefaultBrowser(context)
             Presentation.OnTermAndConditionClick -> TERM_URL.intentToDefaultBrowser(context)
             Presentation.NavigateToForgotPassword -> push(ForgotPasswordScreen())
+            is Presentation.OnLoginFailed -> Toast.makeText(
+                context,
+                event.message,
+                Toast.LENGTH_SHORT
+            ).show()
+
             else -> Unit
         }
     }

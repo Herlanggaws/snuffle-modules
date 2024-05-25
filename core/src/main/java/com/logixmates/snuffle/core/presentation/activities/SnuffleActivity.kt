@@ -1,4 +1,4 @@
-package com.logixmates.snuffle.core.presentation
+package com.logixmates.snuffle.core.presentation.activities
 
 import android.content.Context
 import android.content.Intent
