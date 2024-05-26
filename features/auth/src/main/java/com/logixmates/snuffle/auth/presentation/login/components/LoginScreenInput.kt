@@ -25,6 +25,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.input.ImeAction
@@ -49,6 +50,7 @@ fun LoginScreenInput(
     modifier: Modifier = Modifier,
     onEvent: (LoginUiEvent) -> Unit = {}
 ) {
+    val focusManager = LocalFocusManager.current
     Column(
         modifier
             .fillMaxWidth()
@@ -60,7 +62,10 @@ fun LoginScreenInput(
                 onEvent(Domain.OnEmailChanged(it))
             },
             singleLine = true,
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email, imeAction = ImeAction.Next),
+            keyboardOptions = KeyboardOptions(
+                keyboardType = KeyboardType.Email,
+                imeAction = ImeAction.Next
+            ),
             label = { Text(text = stringResource(R.string.email)) },
             modifier = Modifier.fillMaxWidth(),
             colors = TextFieldDefaults.colors(unfocusedContainerColor = SnuffleColors.Transparent),
@@ -78,7 +83,10 @@ fun LoginScreenInput(
                 PasswordVisualTransformation()
             },
             singleLine = true,
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password, imeAction = ImeAction.Done),
+            keyboardOptions = KeyboardOptions(
+                keyboardType = KeyboardType.Password,
+                imeAction = ImeAction.Done
+            ),
             trailingIcon = {
                 IconButton(onClick = {
                     onEvent(Domain.OnPasswordVisibilityChanged(!state.value.isPasswordVisible))
@@ -131,6 +139,7 @@ fun LoginScreenInput(
                     state.value.passwordError == null &&
                     state.value.isPrivacyConsentChecked,
             onClick = {
+                focusManager.clearFocus()
                 onEvent(Domain.DoLogin)
             },
             colors = ButtonDefaults.buttonColors(

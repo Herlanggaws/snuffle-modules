@@ -6,13 +6,12 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 @Keep
-data class LoginRequest(
+data class RegisterRequest(
     @SerialName("user_name") val userName: String? = null,
     @SerialName("password") val password: String? = null,
-    @SerialName("name") val name: String? = null,
-    @SerialName("email") val email: String? = null,
-    @SerialName("provider") val provider: String? = null,
-    @SerialName("provider_id") val providerId: String? = null,
+    @SerialName("date_of_birth") val dob: String? = null,
+    @SerialName("user_gender") val gender: String? = null,
+    @SerialName("register_with") val registerWith: String? = null,
     @SerialName("notify_token") val notifyToken: String? = null,
     @SerialName("timezone") val timezone: String? = null,
     @SerialName("device_info") val deviceInfo: String? = null,

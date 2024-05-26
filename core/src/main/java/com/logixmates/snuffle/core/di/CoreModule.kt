@@ -1,23 +1,11 @@
 package com.logixmates.snuffle.core.di
 
 import android.content.SharedPreferences
-import com.chuckerteam.chucker.api.ChuckerCollector
-import com.chuckerteam.chucker.api.ChuckerInterceptor
-import com.chuckerteam.chucker.api.RetentionManager
-import com.logixmates.snuffle.core.data.web.validator.ResponseValidatorList
+import com.logixmates.snuffle.core.data.web.SnuffleHttpClient
 import com.tencent.mmkv.MMKV
-import de.jensklingenberg.ktorfit.Ktorfit
-import io.ktor.client.HttpClient
-import io.ktor.client.engine.HttpClientEngine
-import io.ktor.client.engine.okhttp.OkHttp
-import io.ktor.client.plugins.DefaultRequest
-import io.ktor.client.plugins.HttpResponseValidator
-import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
-import io.ktor.client.request.header
-import io.ktor.http.ContentType
-import io.ktor.http.HttpHeaders
-import io.ktor.serialization.kotlinx.json.json
+import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
 import kotlinx.serialization.json.Json
 import org.koin.core.annotation.ComponentScan
 import org.koin.core.annotation.Module
@@ -51,45 +39,7 @@ object CoreModule : SnuffleModules {
             }
         }
         single {
-            ChuckerCollector(
-                context = get(),
-                showNotification = true,
-                retentionPeriod = RetentionManager.Period.ONE_HOUR
-            )
-        }
-        single {
-            ChuckerInterceptor.Builder(get())
-                .collector(get()).maxContentLength(250_000L)
-                .redactHeaders("Auth-Token", "Bearer")
-                .alwaysReadResponseBody(true)
-                .createShortcut(true)
-                .build()
-        }
-        single {
-            OkHttp.create {
-                addInterceptor(get<ChuckerInterceptor>())
-            }
-        }
-        single {
-            HttpClient(get<HttpClientEngine>()) {
-                install(ContentNegotiation) {
-                    json(get<Json>())
-                }
-                HttpResponseValidator {
-                    validateResponse { response ->
-                        get<ResponseValidatorList>().validate(response)
-                    }
-                }
-                install(DefaultRequest) {
-                    header(HttpHeaders.ContentType, ContentType.Application.Json)
-                    header(HttpHeaders.Accept, ContentType.Application.Json)
-                }
-            }
-        }
-        single {
-            Ktorfit.Builder()
-                .baseUrl("https://api.snuffle.app/")
-                .httpClient(get<HttpClient>()).build()
+            get<SnuffleHttpClient>().client
         }
     }
 

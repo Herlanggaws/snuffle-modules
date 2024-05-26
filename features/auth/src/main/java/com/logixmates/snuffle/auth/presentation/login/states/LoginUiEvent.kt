@@ -7,6 +7,7 @@ sealed interface LoginUiEvent {
     sealed interface Presentation : LoginUiEvent {
         @Keep
         data class OnLoginFailed(val message: String?) : Presentation
+
         @Keep
         data class OnLoginSuccess(val data: LoginDomain) : Presentation
         data object DoGoogleLogin : Presentation
@@ -20,7 +21,12 @@ sealed interface LoginUiEvent {
     sealed interface Domain : LoginUiEvent {
         data object DoLogin : Domain
 
-        data class OnGoogleLoginSuccess(val email: String) : Domain
+        @Keep
+        data class OnGoogleLoginSuccess(
+            val name: String?,
+            val providerId: String?,
+            val email: String?
+        ) : Domain
 
         @Keep
         data class OnEmailChanged(val email: String) : Domain

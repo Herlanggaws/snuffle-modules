@@ -2,18 +2,23 @@ package com.logixmates.snuffle.auth.presentation.login
 
 import android.app.Activity
 import android.content.Context
-import android.widget.Toast
+import android.util.Log
+import androidx.activity.ComponentActivity
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.ime
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -23,7 +28,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLifecycleOwner
-import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -46,6 +50,7 @@ import com.logixmates.snuffle.auth.presentation.login.components.LoginScreenInpu
 import com.logixmates.snuffle.auth.presentation.login.states.LoginUiEvent
 import com.logixmates.snuffle.auth.presentation.login.states.LoginUiEvent.Presentation
 import com.logixmates.snuffle.auth.presentation.login.states.LoginUiState
+import com.logixmates.snuffle.auth.presentation.navigation.AuthExtNavigator
 import com.logixmates.snuffle.auth.presentation.register.RegisterScreen
 import com.logixmates.snuffle.core.presentation.components.Loader
 import com.logixmates.snuffle.core.presentation.utils.intentToDefaultBrowser
@@ -65,8 +70,8 @@ class LoginScreen : Screen, KoinComponent {
         val lifecycleOwner = LocalLifecycleOwner.current
         val navigator = LocalNavigator.currentOrThrow
         val context = LocalContext.current
-        val keyboardController = LocalSoftwareKeyboardController.current
         val googleSignInClient by inject<GoogleSignInClient> { parametersOf(context as Activity) }
+        val snackbarHostState = remember { SnackbarHostState() }
         val googleSignInResult = rememberLauncherForActivityResult(
             ActivityResultContracts.StartActivityForResult()
         ) { result ->
@@ -75,7 +80,14 @@ class LoginScreen : Screen, KoinComponent {
                 if (result.data != null) {
                     val task: Task<GoogleSignInAccount> =
                         GoogleSignIn.getSignedInAccountFromIntent(intent)
-                    screenModel.onEvent(LoginUiEvent.Domain.OnGoogleLoginSuccess(task.result.email.orEmpty()))
+                    val account = task.result
+                    screenModel.onEvent(
+                        LoginUiEvent.Domain.OnGoogleLoginSuccess(
+                            name = account.displayName,
+                            providerId = account.id,
+                            email = account.email
+                        )
+                    )
                 }
             }
         }
@@ -87,46 +99,82 @@ class LoginScreen : Screen, KoinComponent {
         LaunchedEffect(Unit) {
             screenModel.uiEvent.flowWithLifecycle(lifecycleOwner.lifecycle)
                 .filterIsInstance<Presentation>()
-                .onEach { navigator.onEvent(context, it) }
-                .filterIsInstance<LoginUiEvent.Domain.DoLogin>()
-                .onEach { keyboardController?.hide() }
+                .onEach { navigator.onEvent(context, it, snackbarHostState) }
                 .filterIsInstance<Presentation.DoGoogleLogin>()
                 .onEach {
                     googleSignInResult.launch(googleSignInClient.signInIntent)
-                    keyboardController?.hide()
                 }
                 .launchIn(this)
         }
-        LoginScreenContent(uiState, onEvent = screenModel::onEvent)
+        LoginScreenContent(
+            state = uiState,
+            snackbarHostState = snackbarHostState,
+            onEvent = screenModel::onEvent
+        )
     }
 
     @Composable
     private fun LoginScreenContent(
         state: State<LoginUiState>,
+        snackbarHostState: SnackbarHostState,
         modifier: Modifier = Modifier,
         onEvent: (LoginUiEvent) -> Unit = {}
     ) {
-        Column(
-            modifier
-                .fillMaxSize()
-                .verticalScroll(rememberScrollState())
-        ) {
-            LoginScreenHeader(onEvent = onEvent)
-            LoginScreenInput(
-                modifier = Modifier.padding(top = 24.dp),
-                state = state,
-                onEvent = onEvent
-            )
-            Text(
-                text = stringResource(R.string.login_disclaimer),
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(vertical = 16.dp),
-                textAlign = TextAlign.Center
-            )
+        Scaffold(
+            contentWindowInsets = WindowInsets.ime,
+            modifier = modifier.imePadding(),
+            snackbarHost = {
+                SnackbarHost(snackbarHostState)
+            }
+        ) { padding ->
+            Column(
+                Modifier
+                    .consumeWindowInsets(padding)
+                    .fillMaxSize()
+                    .verticalScroll(rememberScrollState())
+            ) {
+                LoginScreenHeader(onEvent = onEvent)
+                LoginScreenInput(
+                    modifier = Modifier.padding(top = 24.dp),
+                    state = state,
+                    onEvent = onEvent
+                )
+                Text(
+                    text = stringResource(R.string.login_disclaimer),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 16.dp),
+                    textAlign = TextAlign.Center
+                )
+            }
+            Loader(isVisible = state.value.isLoading)
         }
-        AnimatedVisibility(state.value.isLoading, enter = fadeIn(), exit = fadeOut()) {
-            Loader()
+    }
+
+    private suspend fun Navigator.onEvent(
+        context: Context,
+        event: Presentation,
+        snackbarHostState: SnackbarHostState
+    ) {
+        when (event) {
+            Presentation.NavigateToSignUp -> push(RegisterScreen())
+            Presentation.OnCookiePolicyClick -> COOKIES_URL.intentToDefaultBrowser(context)
+            Presentation.OnSnufflePrivacyClick -> PRIVACY_POLICY_URL.intentToDefaultBrowser(context)
+            Presentation.OnTermAndConditionClick -> TERM_URL.intentToDefaultBrowser(context)
+            Presentation.NavigateToForgotPassword -> push(ForgotPasswordScreen())
+            is Presentation.OnLoginFailed -> snackbarHostState.showSnackbar(
+                event.message.toString(),
+            )
+
+            is Presentation.OnLoginSuccess -> {
+                val extNavigator by inject<AuthExtNavigator>()
+                (context as? ComponentActivity)?.run {
+                    extNavigator.with(this).onSignInSuccess()
+                    finish()
+                }
+            }
+
+            else -> Unit
         }
     }
 
@@ -136,24 +184,10 @@ class LoginScreen : Screen, KoinComponent {
         val state = remember {
             mutableStateOf(LoginUiState())
         }
-        LoginScreenContent(state = state)
-    }
-
-    private fun Navigator.onEvent(context: Context, event: Presentation) {
-        when (event) {
-            Presentation.NavigateToSignUp -> push(RegisterScreen())
-            Presentation.OnCookiePolicyClick -> COOKIES_URL.intentToDefaultBrowser(context)
-            Presentation.OnSnufflePrivacyClick -> PRIVACY_POLICY_URL.intentToDefaultBrowser(context)
-            Presentation.OnTermAndConditionClick -> TERM_URL.intentToDefaultBrowser(context)
-            Presentation.NavigateToForgotPassword -> push(ForgotPasswordScreen())
-            is Presentation.OnLoginFailed -> Toast.makeText(
-                context,
-                event.message,
-                Toast.LENGTH_SHORT
-            ).show()
-
-            else -> Unit
+        val snackbarHostState = remember {
+            SnackbarHostState()
         }
+        LoginScreenContent(state = state, snackbarHostState = snackbarHostState)
     }
 
     companion object {

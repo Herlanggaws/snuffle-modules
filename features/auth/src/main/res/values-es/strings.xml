@@ -8,5 +8,8 @@
     <string name="forgot_password">¿Has olvidado tu contraseña?</string>
     <string name="request_reset_password">Solicitar restablecer contraseña</string>
     <string name="login_disclaimer">SNUFFLE no comparte en sus redes sociales</string>
+    <string name="create_an_account">Crea una cuenta</string>
+    <string name="confirm_password">Confirmar contraseña</string>
+    <string name="or_continue_with">Registrarte con</string>
     <string name="term_and_condition">Al iniciar sesión en una cuenta de Snuffle aceptas las Políticas de Privacidad y Cookies de Snuffle y las Políticas de Términos y Condiciones.</string>
 </resources>

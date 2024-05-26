@@ -23,6 +23,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
@@ -46,6 +47,7 @@ fun RegisterScreenInput(
     modifier: Modifier = Modifier,
     onEvent: (RegisterUiEvent) -> Unit = {}
 ) {
+    val focusManager = LocalFocusManager.current
     Column(
         modifier
             .fillMaxWidth()
@@ -57,7 +59,10 @@ fun RegisterScreenInput(
                 onEvent(Domain.OnEmailChanged(it))
             },
             singleLine = true,
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email, imeAction = ImeAction.Next),
+            keyboardOptions = KeyboardOptions(
+                keyboardType = KeyboardType.Email,
+                imeAction = ImeAction.Next
+            ),
             label = { Text(text = stringResource(R.string.email)) },
             modifier = Modifier.fillMaxWidth(),
             colors = TextFieldDefaults.colors(unfocusedContainerColor = SnuffleColors.Transparent),
@@ -70,7 +75,10 @@ fun RegisterScreenInput(
             onValueChange = {
                 onEvent(Domain.OnPasswordChanged(it))
             },
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password, imeAction = ImeAction.Next),
+            keyboardOptions = KeyboardOptions(
+                keyboardType = KeyboardType.Password,
+                imeAction = ImeAction.Next
+            ),
             visualTransformation = if (state.isPasswordVisible) {
                 VisualTransformation.None
             } else {
@@ -98,7 +106,10 @@ fun RegisterScreenInput(
             onValueChange = {
                 onEvent(Domain.OnConfirmPasswordChanged(it))
             },
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password, imeAction = ImeAction.Done),
+            keyboardOptions = KeyboardOptions(
+                keyboardType = KeyboardType.Password,
+                imeAction = ImeAction.Done
+            ),
             visualTransformation = if (state.isConfirmPasswordVisible) {
                 VisualTransformation.None
             } else {
@@ -114,7 +125,7 @@ fun RegisterScreenInput(
                     )
                 }
             },
-            label = { Text(text = stringResource(R.string.password)) },
+            label = { Text(text = stringResource(R.string.confirm_password)) },
             modifier = Modifier.fillMaxWidth(),
             colors = TextFieldDefaults.colors(unfocusedContainerColor = SnuffleColors.Transparent),
             isError = !state.confirmPasswordError.isNullOrBlank(),
@@ -157,6 +168,7 @@ fun RegisterScreenInput(
                     state.confirmPasswordError == null &&
                     state.isPrivacyConsentChecked,
             onClick = {
+                focusManager.clearFocus()
                 onEvent(Domain.DoSignUp)
             },
             colors = ButtonDefaults.buttonColors(
@@ -166,7 +178,7 @@ fun RegisterScreenInput(
                 .fillMaxWidth()
                 .padding(top = 16.dp)
         ) {
-            Text(stringResource(R.string.login))
+            Text(stringResource(R.string.sign_up))
         }
 
         Row(
@@ -178,12 +190,14 @@ fun RegisterScreenInput(
             HorizontalDivider(thickness = 1.dp, modifier = Modifier.weight(1f))
         }
 
-
         Text(
-            text = "Sign up with",
+            text = stringResource(R.string.or_continue_with),
             modifier = Modifier.padding(bottom = 16.dp)
         )
-        GoogleAuthButton(onClick = { onEvent(Presentation.DoGoogleSignUp) })
+        GoogleAuthButton(onClick = {
+            onEvent(Presentation.DoGoogleSignUp)
+            focusManager.clearFocus()
+        })
     }
 }
 

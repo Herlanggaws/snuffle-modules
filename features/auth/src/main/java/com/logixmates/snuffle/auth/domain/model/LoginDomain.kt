@@ -11,8 +11,8 @@ import kotlinx.serialization.Serializable
 @Keep
 data class LoginDomain(
     val name: String
-): Parcelable {
-    constructor(data: LoginResponse?): this(
-        name = data?.profileMain?.name.orEmpty()
+) : Parcelable {
+    constructor(response: LoginResponse?) : this(
+        name = response?.data?.name.orEmpty()
     )
 }

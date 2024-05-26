@@ -53,7 +53,7 @@ class ForgotPasswordModel(
         useCase.stream(
             StoreReadRequest.fresh(_uiState.value.email)
         ) {
-            validator(object: Validator<Response> {
+            validator(object : Validator<Response> {
                 override suspend fun isValid(item: Response): Boolean {
                     return item.error.isNullOrEmpty()
                 }
@@ -67,8 +67,7 @@ class ForgotPasswordModel(
                     onEvent(ForgotPasswordUiEvent.Presentation.ShowSuccess)
                 }
                 if (state is StoreReadResponse.Error) {
-                    val error = state.errorOrNull<Error>()
-                    onEvent(ForgotPasswordUiEvent.Presentation.ShowError(error?.message.toString()))
+                    onEvent(ForgotPasswordUiEvent.Presentation.ShowError(state.errorMessageOrNull()))
                 }
             }.launchIn(this)
     }

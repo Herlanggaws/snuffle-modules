@@ -2,14 +2,12 @@ package com.logixmates.snuffle.core.data.web.validator
 
 import com.logixmates.snuffle.core.data.model.Response
 import com.logixmates.snuffle.core.data.web.exception.HttpStatusCodeException
-import io.ktor.client.statement.HttpResponse
 
 class StatusCodeValidator : ResponseValidator {
-    override suspend fun validate(response: HttpResponse, body: Response) {
-        if ((response.status.value !in MIN_CODE..MAX_CODE) ||
-            (body.statusCode != null && body.statusCode !in MIN_CODE..MAX_CODE)
-        ) {
-            throw HttpStatusCodeException(body.message)
+
+    override suspend fun validate(response: Response) {
+        if (response.statusCode != null && response.statusCode !in MIN_CODE..MAX_CODE) {
+            throw HttpStatusCodeException(response.error?.firstOrNull() ?: response.message)
         }
     }
 

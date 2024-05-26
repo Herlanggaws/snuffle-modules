@@ -1,15 +1,16 @@
 package com.logixmates.snuffle.auth.presentation.login
 
-import android.util.Log
 import cafe.adriel.voyager.core.model.ScreenModel
 import cafe.adriel.voyager.core.model.screenModelScope
 import com.logixmates.snuffle.auth.data.model.LoginRequest
 import com.logixmates.snuffle.auth.domain.usecase.LoginUseCase
 import com.logixmates.snuffle.auth.presentation.login.states.LoginUiEvent
 import com.logixmates.snuffle.auth.presentation.login.states.LoginUiEvent.Domain
+import com.logixmates.snuffle.auth.presentation.login.states.LoginUiEvent.Presentation
 import com.logixmates.snuffle.auth.presentation.login.states.LoginUiState
 import com.logixmates.snuffle.core.presentation.utils.checkEmail
 import com.logixmates.snuffle.core.presentation.utils.checkPassword
+import com.logixmates.snuffle.core.presentation.utils.debounceOnEvent
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -36,6 +37,10 @@ class LoginScreenModel(
     private val _uiEvent = Channel<LoginUiEvent>()
     val uiEvent
         get() = _uiEvent.receiveAsFlow()
+            .debounceOnEvent(
+                Presentation.NavigateToSignUp,
+                Presentation.NavigateToForgotPassword
+            )
             .onEach { if (it is Domain) onDomainEvent(it) }
 
     fun onEvent(event: LoginUiEvent) = screenModelScope.launch {
@@ -49,7 +54,11 @@ class LoginScreenModel(
             is Domain.OnPasswordChanged -> onPasswordChanged(event.password)
             is Domain.OnPasswordVisibilityChanged -> onPasswordVisibilityChanged(event.isPasswordVisible)
             is Domain.OnPrivacyConsentChanged -> onPrivacyConsentChanged(event.isChecked)
-            is Domain.OnGoogleLoginSuccess -> TODO()
+            is Domain.OnGoogleLoginSuccess -> doGoogleLogin(
+                event.name,
+                event.providerId,
+                event.email
+            )
         }
     }
 
@@ -69,17 +78,30 @@ class LoginScreenModel(
         _uiState.update { it.copy(isPrivacyConsentChecked = isChecked) }
     }
 
-    private fun doLogin() = screenModelScope.launch(io) {
+    private fun doLogin() {
         require(_uiState.value.email.isNotBlank())
         require(_uiState.value.password.isNotBlank())
-        loginUseCase.stream(
-            StoreReadRequest.fresh(
-                LoginRequest(
-                    userName = _uiState.value.email,
-                    password = _uiState.value.password
-                )
+        streamLogin(
+            LoginRequest(
+                userName = _uiState.value.email,
+                password = _uiState.value.password
             )
-        ).onEach {
+        )
+    }
+
+    private fun doGoogleLogin(name: String?, providerId: String?, email: String?) {
+        streamLogin(
+            LoginRequest(
+                name = name,
+                providerId = providerId,
+                email = email,
+                provider = "google"
+            )
+        )
+    }
+
+    private fun streamLogin(loginRequest: LoginRequest) = screenModelScope.launch(io) {
+        loginUseCase.stream(StoreReadRequest.fresh(loginRequest)).onEach {
             when (it) {
                 is StoreReadResponse.Loading -> _uiState.update { oldState ->
                     oldState.copy(isLoading = true)
@@ -93,14 +115,14 @@ class LoginScreenModel(
                     _uiState.update { oldState ->
                         oldState.copy(isLoading = false)
                     }
-                    onEvent(LoginUiEvent.Presentation.OnLoginFailed(it.errorMessageOrNull()))
+                    onEvent(Presentation.OnLoginFailed(it.errorMessageOrNull()))
                 }
 
                 is StoreReadResponse.Data -> {
                     _uiState.update { oldState ->
                         oldState.copy(isLoading = false)
                     }
-                    onEvent(LoginUiEvent.Presentation.OnLoginSuccess(it.value))
+                    onEvent(Presentation.OnLoginSuccess(it.value))
                 }
 
                 else -> Unit

@@ -1,10 +1,12 @@
 package com.logixmates.snuffle.core.presentation.components
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -22,25 +24,28 @@ import com.logixmates.snuffle.core.R
 import com.logixmates.snuffle.core.presentation.themes.SnuffleColors
 
 @Composable
-fun Loader(modifier: Modifier = Modifier) {
-    val composition by rememberLottieComposition(LottieCompositionSpec.RawRes(R.raw.new_loader))
-    val progress by animateLottieCompositionAsState(composition)
+fun Loader(isVisible: Boolean, modifier: Modifier = Modifier) {
+    AnimatedVisibility(isVisible, enter = fadeIn(), exit = fadeOut()) {
+        Column(
+            modifier = modifier
+                .background(SnuffleColors.Overlay)
+                .fillMaxSize(),
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
 
-    Column(
-        modifier = modifier
-            .background(SnuffleColors.Overlay)
-            .fillMaxSize(),
-        verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        LottieAnimation(
-            composition = composition,
-            progress = { progress },
-            modifier = Modifier.size(200.dp)
-        )
-        Text(
-            stringResource(R.string.please_wait),
-            color = Color.White
-        )
+            val composition by rememberLottieComposition(LottieCompositionSpec.RawRes(R.raw.lottieloader))
+            val progress by animateLottieCompositionAsState(composition)
+
+            LottieAnimation(
+                composition = composition,
+                progress = { progress },
+                modifier = Modifier.size(200.dp)
+            )
+            Text(
+                stringResource(R.string.please_wait),
+                color = Color.White
+            )
+        }
     }
 }

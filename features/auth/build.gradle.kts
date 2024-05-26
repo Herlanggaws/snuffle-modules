@@ -35,7 +35,7 @@ android {
 
 dependencies {
     implementation(project(":core"))
-    implementation("com.google.android.gms:play-services-auth:20.4.0")
+    implementation(libs.play.services.auth)
 }
 
 publishing {

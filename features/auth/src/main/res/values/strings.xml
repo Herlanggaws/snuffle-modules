@@ -8,5 +8,8 @@
     <string name="login_with">Login with</string>
     <string name="request_reset_password">Request Reset Password</string>
     <string name="login_disclaimer">SNUFFLE does not share on your social media</string>
+    <string name="create_an_account">Create an account</string>
+    <string name="confirm_password">Confirm Password</string>
+    <string name="or_continue_with">Sign up with</string>
     <string name="term_and_condition">By signing an account, you agree with Snuffle Privacy and Cookie Policy and Terms and Conditions Policy</string>
 </resources>
