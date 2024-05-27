@@ -1,4 +1,4 @@
-package com.logixmates.snuffle.auth.data.utils
+package com.logixmates.snuffle.core.data.utils
 
 import com.logixmates.snuffle.core.data.web.validator.ResponseValidatorList
 import kotlinx.serialization.json.Json

@@ -3,7 +3,7 @@ package com.logixmates.snuffle.auth.data.repo
 import com.logixmates.snuffle.auth.data.model.LoginRequest
 import com.logixmates.snuffle.auth.data.model.LoginResponse
 import com.logixmates.snuffle.auth.data.model.RegisterRequest
-import com.logixmates.snuffle.auth.data.utils.validate
+import com.logixmates.snuffle.core.data.utils.validate
 import com.logixmates.snuffle.auth.data.web.AuthWebApi
 import com.logixmates.snuffle.core.data.model.Response
 import org.koin.core.annotation.Single
